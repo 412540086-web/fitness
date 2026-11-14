@@ -1,0 +1,1826 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💕 情侶雙人減脂抗痘打卡與教練督促系統</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome CDN for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter & Noto Sans TC -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti for Celebration Effects -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Chart.js CDN for Weight & Body Fat Trend Curve -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        roseBlush: '#fff1f2',
+                        rosePrimary: '#fb7185',
+                        roseDark: '#e11d48',
+                        roseSoft: '#fecdd3',
+                        cardBg: '#ffffff',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans TC', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 50%, #fbcfe8 100%);
+            min-height: 100vh;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+        .custom-shadow {
+            box-shadow: 0 10px 25px -5px rgba(251, 113, 133, 0.15), 0 8px 10px -6px rgba(251, 113, 133, 0.1);
+        }
+        @keyframes soft-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        .animate-soft-pulse {
+            animation: soft-pulse 3s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="text-slate-700 py-6 px-4 sm:px-6">
+
+    <div class="max-w-md sm:max-w-2xl mx-auto space-y-6">
+
+        <!-- Header & Couple Switcher -->
+        <header class="glass-card rounded-3xl p-6 custom-shadow text-center relative overflow-hidden">
+            <div class="absolute -right-8 -top-8 w-28 h-28 bg-rose-200 rounded-full opacity-40 pointer-events-none"></div>
+            <div class="absolute -left-8 -bottom-8 w-28 h-28 bg-pink-200 rounded-full opacity-40 pointer-events-none"></div>
+
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-100/80 text-roseDark text-[11px] font-bold mb-1.5">
+                <i class="fa-solid fa-crown"></i> Anna的戰情室 ❤️ Fergal的戰情室
+            </div>
+            <h1 id="main-room-title" class="text-2xl sm:text-3xl font-bold text-slate-800 tracking-tight flex items-center justify-center gap-2">
+                <i class="fa-solid fa-heart-pulse text-rosePrimary animate-pulse"></i> Anna的戰情室
+            </h1>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1">考完大解放後，攜手找回發光美肌與完美體態！</p>
+
+            <!-- Dual Current Weight Status Pill -->
+            <div class="inline-flex flex-wrap items-center justify-center gap-2 sm:gap-3 mt-3 px-4 py-2 rounded-2xl bg-white/90 border border-rose-200 shadow-sm text-xs font-bold">
+                <span class="flex items-center gap-1 text-roseDark">
+                    <i class="fa-solid fa-weight-scale"></i> Anna目前體重：<span id="header-user-weight">43.0 kg</span>
+                </span>
+                <span class="text-slate-300">|</span>
+                <span class="flex items-center gap-1 text-indigo-600">
+                    <i class="fa-solid fa-weight-scale"></i> Fergal目前體重：<span id="header-bf-weight">68.0 kg</span>
+                </span>
+            </div>
+
+            <!-- User Selector Tabs -->
+            <div class="flex justify-center gap-3 mt-4">
+                <button onclick="switchUser('user')" id="tab-user" class="px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 shadow-sm flex items-center gap-2 bg-rosePrimary text-white shadow-rose-200">
+                    <i class="fa-solid fa-user-ninja"></i> Anna的戰情室 (<span id="tab-user-weight">43.0kg</span>)
+                </button>
+                <button onclick="switchUser('boyfriend')" id="tab-boyfriend" class="px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 shadow-sm flex items-center gap-2 bg-white text-slate-600 hover:bg-slate-50 border border-slate-200">
+                    <i class="fa-solid fa-user-astronaut"></i> Fergal的戰情室 (<span id="tab-bf-weight">68.0kg</span>)
+                </button>
+            </div>
+        </header>
+
+        <!-- Coach Strict Quote Banner -->
+        <section class="glass-card rounded-2xl p-5 custom-shadow border-l-4 border-rosePrimary animate-soft-pulse relative">
+            <div class="flex items-start gap-4">
+                <div class="w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center shrink-0 text-rosePrimary font-bold text-lg">
+                    <i class="fa-solid fa-bullhorn"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="flex items-center justify-between">
+                        <span id="coach-badge" class="text-xs font-bold uppercase tracking-wider text-rosePrimary">魔鬼教練碎碎念 📢</span>
+                        <button onclick="changeQuote()" class="text-xs text-slate-400 hover:text-rosePrimary transition-colors">
+                            <i class="fa-solid fa-rotate-right"></i> 換一句
+                        </button>
+                    </div>
+                    <p id="coach-quote" class="text-sm font-medium text-slate-700 mt-1 leading-relaxed">
+                        「昨天深夜 10 點才吃晚餐＋喝水暴增 1 公斤那是水腫！今天去潮州吃黑輪與燒冷冰沒關係，但下禮拜一乖乖給我上工，甜食額度只有 3 次、炸物 2 次，少給我偷吃！」
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Target Weight & Body Fat Race Section (NT$1,000 Prize) -->
+        <section class="glass-card rounded-3xl p-5 sm:p-6 custom-shadow space-y-4 border-2 border-amber-300/80 relative overflow-hidden">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-amber-100 pb-3 gap-2">
+                <div>
+                    <h2 class="text-base sm:text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-trophy text-amber-500"></i> 目標體重與體脂挑戰賽
+                    </h2>
+                    <p class="text-xs text-slate-500">規則：誰先同時達成目標體重＋目標體脂，直接獲得 <strong class="text-amber-600">NT$ 1,000 獎金</strong>！</p>
+                </div>
+                <span id="race-winner-badge" class="self-start sm:self-auto px-3 py-1 rounded-full text-xs font-extrabold bg-amber-100 text-amber-800 border border-amber-200">
+                    🔥 NT$ 1,000 獎金爭奪中！
+                </span>
+            </div>
+
+            <!-- Winner Announcement Banner -->
+            <div id="race-winner-banner" class="hidden bg-gradient-to-r from-amber-100 via-yellow-50 to-rose-100 border border-amber-300 rounded-2xl p-4 text-center space-y-2 shadow-sm">
+                <div class="text-sm sm:text-base font-extrabold text-amber-800" id="race-winner-title">
+                    🏆 恭喜冠軍誕生！獲得 NT$ 1,000 減脂大獎！
+                </div>
+                <p class="text-xs text-slate-600" id="race-winner-desc"></p>
+                <div class="flex justify-center gap-2 pt-1">
+                    <button onclick="claimRacePrize()" id="btn-claim-prize" class="px-4 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold shadow transition">
+                        <i class="fa-solid fa-hand-holding-dollar mr-1"></i> 登記領取 NT$ 1,000 獎金
+                    </button>
+                    <button onclick="resetRaceWinner()" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 rounded-xl text-xs font-semibold transition">
+                        重新挑戰
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dual Race Comparison Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Anna Race Card -->
+                <div class="bg-white/85 rounded-2xl p-4 border border-rose-200 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-extrabold text-roseDark flex items-center gap-1">
+                            👧 Anna 衝刺進度
+                        </span>
+                        <span id="anna-race-status" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-rose-50 text-roseDark">進行中</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 text-[11px]">
+                        <div class="bg-rose-50/70 p-2 rounded-xl">
+                            <label class="block text-slate-500 font-semibold">目標體重 (kg)</label>
+                            <input type="number" step="0.1" id="target-weight-user" onchange="updateRaceTarget('user')" class="w-full mt-0.5 px-2 py-1 rounded-lg bg-white border border-rose-200 font-bold text-roseDark focus:outline-none">
+                        </div>
+                        <div class="bg-rose-50/70 p-2 rounded-xl">
+                            <label class="block text-slate-500 font-semibold">目標體脂 (%)</label>
+                            <input type="number" step="0.1" id="target-bf-user" onchange="updateRaceTarget('user')" class="w-full mt-0.5 px-2 py-1 rounded-lg bg-white border border-rose-200 font-bold text-roseDark focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 text-[11px]">
+                        <div>
+                            <div class="flex justify-between font-semibold text-slate-600 mb-1">
+                                <span>體重：<span id="race-cur-w-user">43.0</span> → <span id="race-tar-w-user">40.5</span> kg</span>
+                                <span id="race-pct-w-user" class="text-roseDark font-bold">0%</span>
+                            </div>
+                            <div class="w-full bg-rose-100 rounded-full h-2 overflow-hidden">
+                                <div id="race-bar-w-user" class="bg-rosePrimary h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between font-semibold text-slate-600 mb-1">
+                                <span>體脂：<span id="race-cur-bf-user">22.8</span> → <span id="race-tar-bf-user">20.0</span> %</span>
+                                <span id="race-pct-bf-user" class="text-roseDark font-bold">0%</span>
+                            </div>
+                            <div class="w-full bg-rose-100 rounded-full h-2 overflow-hidden">
+                                <div id="race-bar-bf-user" class="bg-roseDark h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fergal Race Card -->
+                <div class="bg-white/85 rounded-2xl p-4 border border-indigo-200 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-extrabold text-indigo-600 flex items-center gap-1">
+                            👦 Fergal 衝刺進度
+                        </span>
+                        <span id="fergal-race-status" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600">進行中</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 text-[11px]">
+                        <div class="bg-indigo-50/70 p-2 rounded-xl">
+                            <label class="block text-slate-500 font-semibold">目標體重 (kg)</label>
+                            <input type="number" step="0.1" id="target-weight-boyfriend" onchange="updateRaceTarget('boyfriend')" class="w-full mt-0.5 px-2 py-1 rounded-lg bg-white border border-indigo-200 font-bold text-indigo-600 focus:outline-none">
+                        </div>
+                        <div class="bg-indigo-50/70 p-2 rounded-xl">
+                            <label class="block text-slate-500 font-semibold">目標體脂 (%)</label>
+                            <input type="number" step="0.1" id="target-bf-boyfriend" onchange="updateRaceTarget('boyfriend')" class="w-full mt-0.5 px-2 py-1 rounded-lg bg-white border border-indigo-200 font-bold text-indigo-600 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 text-[11px]">
+                        <div>
+                            <div class="flex justify-between font-semibold text-slate-600 mb-1">
+                                <span>體重：<span id="race-cur-w-bf">68.0</span> → <span id="race-tar-w-bf">64.0</span> kg</span>
+                                <span id="race-pct-w-bf" class="text-indigo-600 font-bold">0%</span>
+                            </div>
+                            <div class="w-full bg-indigo-100 rounded-full h-2 overflow-hidden">
+                                <div id="race-bar-w-bf" class="bg-indigo-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between font-semibold text-slate-600 mb-1">
+                                <span>體脂：<span id="race-cur-bf-bf">21.5</span> → <span id="race-tar-bf-bf">16.0</span> %</span>
+                                <span id="race-pct-bf-bf" class="text-indigo-600 font-bold">0%</span>
+                            </div>
+                            <div class="w-full bg-indigo-100 rounded-full h-2 overflow-hidden">
+                                <div id="race-bar-bf-bf" class="bg-indigo-700 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Weekly Quota & Sleep Overview Card -->
+        <div class="grid grid-cols-3 gap-3">
+            <!-- Sweets & Fried Food Quota -->
+            <div class="glass-card rounded-2xl p-3.5 text-center custom-shadow flex flex-col justify-between">
+                <div class="text-[11px] text-slate-500 font-semibold">本週破戒額度</div>
+                <div class="mt-1 space-y-1">
+                    <div class="flex items-center justify-between text-xs px-1">
+                        <span>🍰 甜食</span>
+                        <span class="font-bold text-roseDark"><span id="stat-sweets">0</span>/3次</span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs px-1">
+                        <span>🍗 炸物</span>
+                        <span class="font-bold text-amber-600"><span id="stat-fried">0</span>/2次</span>
+                    </div>
+                </div>
+                <div class="flex justify-center gap-1.5 mt-2">
+                    <button onclick="logTreat('sweets')" class="px-2 py-0.5 bg-rose-100 hover:bg-rose-200 text-roseDark rounded text-[10px] font-bold transition">+1甜食</button>
+                    <button onclick="logTreat('fried')" class="px-2 py-0.5 bg-amber-100 hover:bg-amber-200 text-amber-700 rounded text-[10px] font-bold transition">+1炸物</button>
+                </div>
+            </div>
+
+            <!-- Gradual Sleep Target -->
+            <div class="glass-card rounded-2xl p-3.5 text-center custom-shadow flex flex-col justify-between">
+                <div class="text-[11px] text-slate-500 font-semibold">漸進式作息目標</div>
+                <div class="my-auto">
+                    <div class="text-base sm:text-lg font-bold text-slate-700" id="stat-sleep">凌晨 2:00</div>
+                    <div class="text-[10px] text-slate-400" id="stat-sleep-week">第 1 週標準</div>
+                </div>
+                <button onclick="cycleSleepWeek()" class="mt-1 px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded text-[10px] font-semibold transition">
+                    切換週次目標
+                </button>
+            </div>
+
+            <!-- Accumulated Fine Box -->
+            <div class="glass-card rounded-2xl p-3.5 text-center custom-shadow flex flex-col justify-between border border-rose-200">
+                <div class="text-[11px] text-slate-500 font-semibold">本週累積罰款</div>
+                <div class="my-auto">
+                    <div class="text-lg sm:text-xl font-extrabold text-roseDark" id="stat-fine">NT$ 0</div>
+                    <div class="text-[10px] text-slate-400">未達標一項罰 $100</div>
+                </div>
+                <button onclick="addViolation(1, '手動登記未達標')" class="mt-1 px-2 py-0.5 bg-rosePrimary hover:bg-roseDark text-white rounded text-[10px] font-bold transition">
+                    + 記一筆 ($100)
+                </button>
+            </div>
+        </div>
+
+        <!-- 1800cc Water & Auto-Accumulated Weekly Exercise Trackers -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Water Tracker (1800cc) -->
+            <div class="glass-card rounded-3xl p-5 custom-shadow space-y-3 flex flex-col justify-between">
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-sm font-bold text-slate-800 flex items-center gap-1.5">
+                            <i class="fa-solid fa-droplet text-sky-500"></i> 今日飲水目標 (1800cc)
+                        </h3>
+                        <span class="text-xs font-bold text-sky-600" id="water-text">0 / 1800 cc</span>
+                    </div>
+                    <div class="w-full bg-sky-100 rounded-full h-3 overflow-hidden">
+                        <div id="water-bar" class="bg-gradient-to-r from-sky-400 to-blue-500 h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="space-y-2 pt-1">
+                    <div class="flex items-center justify-between gap-2">
+                        <button onclick="addWater(300)" class="flex-1 py-1.5 bg-sky-500 hover:bg-sky-600 text-white rounded-xl text-xs font-bold shadow-sm transition">
+                            + 300cc (一杯水)
+                        </button>
+                        <button onclick="addWater(-300)" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-semibold transition">
+                            -300
+                        </button>
+                    </div>
+                    <p class="text-[10px] text-slate-400 text-center">喝滿 1800cc 將自動勾選今日喝水打卡 💧</p>
+                </div>
+            </div>
+
+            <!-- Auto-Accumulated Weekly Exercise Tracker (Read-Only from Daily Check-ins) -->
+            <div class="glass-card rounded-3xl p-5 custom-shadow space-y-3">
+                <div class="flex items-center justify-between gap-1">
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-800 flex items-center gap-1.5">
+                            <i class="fa-solid fa-dumbbell text-rosePrimary"></i> 本週運動累積進度
+                        </h3>
+                        <span class="text-[10px] text-roseDark font-semibold">🔄 由每日打卡自動累積</span>
+                    </div>
+                    <!-- Rest Exception Toggle -->
+                    <button onclick="toggleRestMode()" id="btn-rest-mode" class="px-2.5 py-1 rounded-full text-[10px] font-bold transition flex items-center gap-1 bg-slate-100 text-slate-500 border border-slate-200 shrink-0">
+                        <i class="fa-solid fa-bed"></i> 生理期/通車休息
+                    </button>
+                </div>
+
+                <!-- Total Weekly Exercise Summary Bar -->
+                <div class="bg-rose-50/70 px-3 py-2 rounded-xl border border-rose-100 space-y-1.5">
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="font-bold text-slate-700">本週總累積運動次數</span>
+                        <span id="ex-total-count" class="font-extrabold text-roseDark">0 / 5 次</span>
+                    </div>
+                    <div class="w-full bg-rose-100 rounded-full h-2 overflow-hidden">
+                        <div id="ex-total-bar" class="bg-gradient-to-r from-rose-400 to-roseDark h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Auto-Accumulated Cardio & Body Sculpting Counters -->
+                <div class="space-y-2 text-xs">
+                    <div class="flex items-center justify-between bg-white/80 p-2.5 rounded-xl border border-slate-100">
+                        <div>
+                            <span class="font-bold text-slate-700">🏃‍♀️ 有氧運動</span>
+                            <span class="text-[10px] text-slate-400 ml-1">(目標 2-3次/週)</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span id="ex-cardio-status" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 font-semibold">差 2 次</span>
+                            <span id="ex-cardio-count" class="font-extrabold text-rosePrimary text-sm">0 次</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between bg-white/80 p-2.5 rounded-xl border border-slate-100">
+                        <div>
+                            <span class="font-bold text-slate-700">🧘‍♀️ 體態雕塑</span>
+                            <span class="text-[10px] text-slate-400 ml-1">(目標 3-4次/週)</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span id="ex-sculpt-status" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 font-semibold">差 3 次</span>
+                            <span id="ex-sculpt-count" class="font-extrabold text-purple-600 text-sm">0 次</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Checked Days Badges -->
+                <div id="ex-days-summary" class="flex flex-wrap gap-1 pt-0.5 text-[10px] text-slate-400">
+                    尚未在下方每日面板勾選運動
+                </div>
+
+                <p id="rest-mode-notice" class="hidden text-[10px] text-amber-600 font-medium bg-amber-50 px-2.5 py-1 rounded-lg">
+                    ✨ 生理期前／通車回家休息模式啟動中：本週免除運動未達標罰款！
+                </p>
+            </div>
+        </section>
+
+        <!-- Daily Check-in Panel (Placed prominently for easy daily ticking) -->
+        <main class="glass-card rounded-3xl p-6 sm:p-8 custom-shadow space-y-6 border-2 border-rose-200/80">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 pb-4 gap-2">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-regular fa-calendar-check text-rosePrimary"></i> 每日進度打卡面板
+                    </h2>
+                    <p class="text-xs text-slate-400" id="current-user-subtitle">目前檢視：Anna的戰情室專屬任務卡</p>
+                </div>
+                <!-- Day Selector -->
+                <div class="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0" id="day-tabs">
+                    <!-- Dynamic day buttons generated by JS -->
+                </div>
+            </div>
+
+            <!-- Check-in Items List -->
+            <div class="space-y-3.5" id="checkin-items-container">
+                <!-- Populated by JS -->
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="space-y-2 pt-2">
+                <div class="flex justify-between text-xs font-semibold text-slate-600">
+                    <span id="progress-day-label">今日打卡進度</span>
+                    <span id="progress-text">0 / 5 項</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
+                    <div id="progress-bar" class="bg-gradient-to-r from-rose-400 to-rosePrimary h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Weight, Body Fat & Bowel Movement Tracker -->
+        <section class="glass-card rounded-3xl p-5 sm:p-6 custom-shadow space-y-4 border border-rose-100">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 pb-3 gap-2">
+                <div>
+                    <h2 class="text-base sm:text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-notes-medical text-rosePrimary"></i> 身體數據與排便順暢紀錄
+                    </h2>
+                    <p class="text-xs text-slate-400">追蹤體重、體脂變化，並改善兩人的便秘困擾 💩✨</p>
+                </div>
+                <span id="bowel-status-badge" class="self-start sm:self-auto px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-roseDark">
+                    0次：便秘警報🚨 快喝水吃菜！
+                </span>
+            </div>
+
+            <!-- Bowel Movement Counter & Stool Status -->
+            <div class="bg-gradient-to-r from-amber-50/90 to-rose-50/90 rounded-2xl p-4 border border-amber-200/70 space-y-3">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-sm font-bold text-slate-800 flex items-center gap-1.5">
+                            💩 今日排便次數紀錄
+                        </div>
+                        <p class="text-[11px] text-slate-500 mt-0.5">多喝 1800cc 水＋深綠色蔬菜，告別卡卡！</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="updateBowelCount(-1)" class="w-8 h-8 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 font-bold text-slate-600 shadow-sm transition">-1</button>
+                        <span id="bowel-count-display" class="text-lg font-extrabold text-amber-700 w-12 text-center">0 次</span>
+                        <button onclick="updateBowelCount(1)" class="px-3 h-8 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-sm transition">+1 次</button>
+                    </div>
+                </div>
+
+                <!-- Stool Condition Quick Tags -->
+                <div class="flex flex-wrap items-center gap-2 pt-1">
+                    <span class="text-[11px] font-semibold text-slate-500">今日順暢度：</span>
+                    <button onclick="setBowelCondition('還沒上廁所')" id="cond-none" class="px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition bg-white text-slate-600 border-slate-200">還沒上廁所</button>
+                    <button onclick="setBowelCondition('偏硬/卡卡')" id="cond-hard" class="px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition bg-white text-slate-600 border-slate-200">偏硬 / 卡卡</button>
+                    <button onclick="setBowelCondition('順暢成形')" id="cond-smooth" class="px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition bg-white text-slate-600 border-slate-200">順暢成形 ✨</button>
+                </div>
+            </div>
+
+            <!-- Weight & Body Fat Input Form -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 items-end">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-600 mb-1">今日體重 (kg)</label>
+                    <input type="number" step="0.1" id="input-weight" placeholder="例如 42.5" class="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-sm font-semibold text-slate-700 focus:outline-none focus:border-rosePrimary">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-600 mb-1">今日體脂率 (%)</label>
+                    <input type="number" step="0.1" id="input-bodyfat" placeholder="例如 22.5" class="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-sm font-semibold text-slate-700 focus:outline-none focus:border-rosePrimary">
+                </div>
+                <button onclick="saveBodyMetrics()" class="col-span-2 sm:col-span-1 py-2 px-4 bg-gradient-to-r from-rosePrimary to-roseDark text-white rounded-xl text-xs font-bold shadow hover:opacity-95 transition h-[38px]">
+                    <i class="fa-solid fa-floppy-disk mr-1"></i> 記錄今日數據
+                </button>
+            </div>
+
+            <!-- Latest Metrics Summary & History List -->
+            <div class="flex flex-wrap items-center justify-between text-xs bg-white/70 px-3.5 py-2.5 rounded-xl border border-slate-100 gap-2">
+                <span>目前體重：<strong id="summary-weight" class="text-roseDark">43.0 kg</strong> (<span id="summary-weight-delta" class="text-slate-500">初始紀錄</span>)</span>
+                <span>最新體脂：<strong id="summary-bodyfat" class="text-slate-700">-- %</strong></span>
+            </div>
+
+            <!-- Weight-Loss Success Encouragement Card -->
+            <div id="weight-encouragement-card" class="bg-gradient-to-r from-rose-50 via-pink-50 to-amber-50 rounded-2xl p-4 border border-rose-200/80 shadow-sm space-y-1.5 transition-all duration-300">
+                <div class="flex items-center justify-between">
+                    <span id="encouragement-badge" class="text-xs font-extrabold text-roseDark flex items-center gap-1.5">
+                        <i class="fa-solid fa-sparkles text-amber-500"></i> 減重成功鼓勵話語 ✨
+                    </span>
+                    <button onclick="refreshEncouragementQuote()" class="text-[11px] text-rosePrimary hover:text-roseDark font-semibold transition">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> 換一句鼓勵
+                    </button>
+                </div>
+                <p id="encouragement-text" class="text-xs sm:text-sm font-medium text-slate-700 leading-relaxed">
+                    「Anna 準備出發囉！只要連續幾天喝足 1800cc 水、排便順暢並按時關燈睡覺，水腫退掉後體重馬上就會漂亮下降，發光美肌跟小蠻腰都在等妳！」
+                </p>
+            </div>
+
+            <!-- Weight & Body Fat Trend Line Chart -->
+            <div class="bg-white/85 rounded-2xl p-4 border border-slate-100 space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                        <i class="fa-solid fa-chart-line text-rosePrimary"></i> 體重 & 體脂變化曲線圖
+                    </span>
+                    <span class="text-[10px] text-slate-400">輸入新數據即自動更新曲線</span>
+                </div>
+                <div class="relative w-full h-48 sm:h-56">
+                    <canvas id="bodyMetricsChart"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-white/60 rounded-xl p-3 space-y-1.5 max-h-32 overflow-y-auto" id="body-history-list">
+                <p class="text-[11px] text-slate-400 text-center">尚未新增體重／體脂歷史紀錄，快輸入今日數據吧！</p>
+            </div>
+        </section>
+
+        <!-- Weekly Fine Accumulation & Settlement Panel -->
+        <section class="glass-card rounded-3xl p-6 custom-shadow space-y-4 border-2 border-rose-200/80">
+            <div class="flex items-center justify-between border-b border-rose-100 pb-3">
+                <div>
+                    <h2 class="text-base sm:text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-sack-dollar text-amber-500"></i> 情侶每週罰款累積與結算
+                    </h2>
+                    <p class="text-xs text-slate-500">規則：每週結算一次，一項沒做到罰 <strong class="text-roseDark">NT$ 100</strong></p>
+                </div>
+                <button onclick="openSettlementModal()" class="px-4 py-2 bg-gradient-to-r from-rosePrimary to-roseDark text-white rounded-xl text-xs font-bold shadow-md hover:opacity-95 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-calculator"></i> 每週結算
+                </button>
+            </div>
+
+            <!-- Dual Comparison Summary -->
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-white/80 rounded-2xl p-3.5 border border-rose-100">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-700">👧 Anna 的違規罰款</span>
+                        <span class="text-xs font-semibold text-slate-400" id="user-violation-count">0 項</span>
+                    </div>
+                    <div class="text-xl font-extrabold text-roseDark mt-1" id="user-fine-total">NT$ 0</div>
+                    <div class="flex gap-1.5 mt-2">
+                        <button onclick="adjustUserFine('user', 1, '補記違規')" class="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-roseDark rounded-lg text-[11px] font-bold">+1項 ($100)</button>
+                        <button onclick="adjustUserFine('user', -1, '撤銷')" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-[11px]">-1</button>
+                    </div>
+                </div>
+
+                <div class="bg-white/80 rounded-2xl p-3.5 border border-indigo-100">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-700">👦 Fergal 的違規罰款</span>
+                        <span class="text-xs font-semibold text-slate-400" id="bf-violation-count">0 項</span>
+                    </div>
+                    <div class="text-xl font-extrabold text-indigo-600 mt-1" id="bf-fine-total">NT$ 0</div>
+                    <div class="flex gap-1.5 mt-2">
+                        <button onclick="adjustUserFine('boyfriend', 1, '補記違規')" class="px-2 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg text-[11px] font-bold">+1項 ($100)</button>
+                        <button onclick="adjustUserFine('boyfriend', -1, '撤銷')" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-[11px]">-1</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Violation Log -->
+            <div class="bg-white/60 rounded-xl p-3 space-y-1.5 max-h-28 overflow-y-auto" id="violation-log-list">
+                <p class="text-[11px] text-slate-400 text-center">目前本週尚無違規紀錄，繼續保持！✨</p>
+            </div>
+        </section>
+
+        <!-- Penalty & Rules Reminder Card -->
+        <footer class="glass-card rounded-2xl p-5 custom-shadow text-xs text-slate-500 space-y-2">
+            <div class="font-bold text-slate-700 flex items-center gap-1.5">
+                <i class="fa-solid fa-triangle-exclamation text-amber-500"></i> 情侶雙人約束條款
+            </div>
+            <ul class="list-disc list-inside space-y-1 text-[11px] leading-relaxed">
+                <li><strong class="text-slate-700">每週罰款結算</strong>：每週日晚上結算，任一項目（喝水1800cc、運動累積次數、入睡時間、飲食額度）沒做到，<strong>一項罰 $100</strong>！</li>
+                <li><strong class="text-slate-700">破戒飲食上限</strong>：一週只能吃 <strong>3 次甜食</strong> 或 <strong>2 次炸物</strong>，超過一次直接自動記一筆 $100 罰款！</li>
+                <li><strong class="text-slate-700">休息例外條款</strong>：生理期前不適或通車回家時，開啟休息模式即可免除該次運動未達標罰款。</li>
+            </ul>
+        </footer>
+
+    </div>
+
+    <!-- Settlement Modal -->
+    <div id="settlement-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-rose-100">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-receipt text-rosePrimary"></i> 本週情侶罰款結算單
+                </h3>
+                <button onclick="closeSettlementModal()" class="text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div id="settlement-content" class="space-y-3 text-sm text-slate-600">
+                <!-- Populated dynamically -->
+            </div>
+            <div class="flex gap-2 pt-2">
+                <button onclick="resetWeeklyStats()" class="flex-1 py-2.5 bg-rosePrimary hover:bg-roseDark text-white rounded-xl text-xs font-bold shadow transition">
+                    確認結算並開啟新的一週
+                </button>
+                <button onclick="closeSettlementModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-semibold transition">
+                    關閉
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Toast Notification -->
+    <div id="toast-banner" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-4 py-2.5 rounded-full text-xs font-semibold shadow-lg opacity-0 pointer-events-none transition-opacity duration-300 z-50 flex items-center gap-2">
+        <i class="fa-solid fa-bell text-rosePrimary"></i>
+        <span id="toast-message">通知訊息</span>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        let currentUser = 'user'; // 'user' (Anna) or 'boyfriend' (Fergal)
+        let currentDayIndex = 0;   // 0: Mon ... 6: Sun
+        let metricsChartInstance = null;
+
+        const days = [
+            { id: 'mon', name: '週一' },
+            { id: 'tue', name: '週二' },
+            { id: 'wed', name: '週三' },
+            { id: 'thu', name: '週四' },
+            { id: 'fri', name: '週五' },
+            { id: 'sat', name: '週六' },
+            { id: 'sun', name: '週日' }
+        ];
+
+        const sleepStages = [
+            { week: '第 1 週標準', time: '凌晨 2:00' },
+            { week: '第 2 週標準', time: '凌晨 1:30' },
+            { week: '第 3 週標準', time: '凌晨 1:00' },
+            { week: '第 4 週終極目標', time: '凌晨 12:30' }
+        ];
+
+        // Build structured 7-day check-in list for each user
+        function createDefaultTasks(role) {
+            const isAnna = role === 'user';
+            const dayGuides = [
+                {
+                    diet: isAnna ? '午餐外食清淡（麵/便當）、晚餐自己煮健康餐、守住甜食炸物額度' : '陪跑飲食監督：不吃炸物甜食誘惑 Anna，違規罰 $100',
+                    skincare: isAnna ? '早晚基礎保濕＋思利安藥膏局部抗痘' : '睡前不滑手機干擾 Anna 睡眠＋基礎清潔'
+                },
+                {
+                    diet: isAnna ? '午餐外食、晚餐自己煮健康餐、拒絕含糖飲料' : '健康餐支援，不准點消夜害 Anna 水腫',
+                    skincare: isAnna ? '早晚保濕＋局部抗痘護理，遠離睡前藍光' : '準時關燈不熬夜滑手機'
+                },
+                {
+                    diet: isAnna ? '午餐全家漢堡+無糖咖啡、晚餐鹹水雞或滷味（去油減鹽）' : '清淡晚餐陪伴，守住炸物甜食額度',
+                    skincare: isAnna ? '下午 2 點後不喝咖啡因，夜間加強保濕' : '配合準時關燈休息'
+                },
+                {
+                    diet: isAnna ? '午餐波奇碗（高纖健康）、晚餐自己煮' : '波奇碗或原型食物餐，陪伴不破戒',
+                    skincare: isAnna ? '做好保濕與思利安藥膏局部抗痘' : '保持良好作息與睡眠品質'
+                },
+                {
+                    diet: isAnna ? '午餐全家漢堡+咖啡、晚餐外食平衡' : '均衡飲食，不准偷買鹽酥雞誘惑',
+                    skincare: isAnna ? '週末前夕做好臉部清潔與舒緩保濕' : '準時關燈就寢'
+                },
+                {
+                    diet: isAnna ? '享受週末餐，但留意一週甜食≤3次、炸物≤2次上限' : '陪 Anna 吃好料，嚴守甜食3次/炸物2次上限',
+                    skincare: isAnna ? '大餐後加強補水與夜間修護' : '維持規律作息不熬夜'
+                },
+                {
+                    diet: isAnna ? '清淡飲食收心，檢查本週甜食/炸物是否超標' : '清淡收心飲食，確認本週無超標',
+                    skincare: isAnna ? '週日晚上參與罰款結算，早睡迎接新的一週' : '週日結算罰款＋準時關燈就寢'
+                }
+            ];
+
+            return dayGuides.map((g, idx) => ({
+                diet: {
+                    title: isAnna ? '🥗 飲食控制' : '🥗 陪跑飲食監督',
+                    desc: g.diet,
+                    checked: false
+                },
+                water: {
+                    title: '💧 喝水 1800cc',
+                    desc: isAnna ? '喝足 1800cc 白開水，促進排便與代謝消水腫' : '跟 Anna 一起喝滿 1800cc 白開水，不偷喝含糖飲料',
+                    checked: false
+                },
+                exercise: {
+                    title: '💪 今日運動（擇一勾選）',
+                    desc: '選擇「有氧運動」或「體態雕塑」其中一項打卡，將自動計入本週累積次數',
+                    selectedType: null // null | 'cardio' | 'sculpt'
+                },
+                sleep: {
+                    title: '😴 入睡時間達標',
+                    desc: '符合本週漸進式作息目標關燈睡覺（可選填實際入睡時間）',
+                    checked: false,
+                    bedtime: ''
+                },
+                skincare: {
+                    title: isAnna ? '✨ 抗痘保濕保養' : '🛡️ 睡前自律護航',
+                    desc: g.skincare,
+                    checked: false
+                }
+            }));
+        }
+
+        const defaultData = {
+            sleepStageIndex: 0,
+            raceWinner: null,
+            prizeClaimed: false,
+            logs: [],
+            profiles: {
+                user: {
+                    startWeight: 43.0,
+                    currentWeight: 43.0,
+                    targetWeight: 40.5,
+                    startBodyFat: 22.8,
+                    currentBodyFat: 22.8,
+                    targetBodyFat: 20.0,
+                    bowelCount: 0,
+                    bowelCondition: '還沒上廁所',
+                    bodyLogs: [
+                        { date: '基準紀錄', weight: '43.0', bodyFat: '22.8', bowelCount: 0, bowelCondition: '還沒上廁所' }
+                    ],
+                    water: 0,
+                    sweets: 0,
+                    fried: 0,
+                    restMode: false,
+                    violations: 0,
+                    dailyCheckins: createDefaultTasks('user')
+                },
+                boyfriend: {
+                    startWeight: 68.0,
+                    currentWeight: 68.0,
+                    targetWeight: 64.0,
+                    startBodyFat: 21.5,
+                    currentBodyFat: 21.5,
+                    targetBodyFat: 16.0,
+                    bowelCount: 0,
+                    bowelCondition: '還沒上廁所',
+                    bodyLogs: [
+                        { date: '基準紀錄', weight: '68.0', bodyFat: '21.5', bowelCount: 0, bowelCondition: '還沒上廁所' }
+                    ],
+                    water: 0,
+                    sweets: 0,
+                    fried: 0,
+                    restMode: false,
+                    violations: 0,
+                    dailyCheckins: createDefaultTasks('boyfriend')
+                }
+            }
+        };
+
+        // Load or migrate state cleanly
+        function loadAppData() {
+            const savedV7 = localStorage.getItem('couple_fitness_data_v7');
+            if (savedV7) {
+                try {
+                    const parsed = JSON.parse(savedV7);
+                    ['user', 'boyfriend'].forEach(role => {
+                        if (!parsed.profiles[role].dailyCheckins || parsed.profiles[role].dailyCheckins.length !== 7) {
+                            parsed.profiles[role].dailyCheckins = createDefaultTasks(role);
+                        }
+                    });
+                    return parsed;
+                } catch (e) {
+                    return JSON.parse(JSON.stringify(defaultData));
+                }
+            }
+
+            // Migrate body metrics & logs from v6 if present
+            const savedV6 = localStorage.getItem('couple_fitness_data_v6');
+            const fresh = JSON.parse(JSON.stringify(defaultData));
+            if (savedV6) {
+                try {
+                    const oldData = JSON.parse(savedV6);
+                    fresh.sleepStageIndex = oldData.sleepStageIndex || 0;
+                    fresh.raceWinner = oldData.raceWinner || null;
+                    fresh.prizeClaimed = oldData.prizeClaimed || false;
+                    fresh.logs = oldData.logs || [];
+                    ['user', 'boyfriend'].forEach(role => {
+                        if (oldData.profiles && oldData.profiles[role]) {
+                            const op = oldData.profiles[role];
+                            const np = fresh.profiles[role];
+                            np.startWeight = op.startWeight ?? np.startWeight;
+                            np.currentWeight = op.currentWeight ?? np.currentWeight;
+                            np.targetWeight = op.targetWeight ?? np.targetWeight;
+                            np.startBodyFat = op.startBodyFat ?? np.startBodyFat;
+                            np.currentBodyFat = op.currentBodyFat ?? np.currentBodyFat;
+                            np.targetBodyFat = op.targetBodyFat ?? np.targetBodyFat;
+                            np.bowelCount = op.bowelCount ?? 0;
+                            np.bowelCondition = op.bowelCondition ?? '還沒上廁所';
+                            np.bodyLogs = op.bodyLogs ?? np.bodyLogs;
+                            np.water = op.water ?? 0;
+                            np.sweets = op.sweets ?? 0;
+                            np.fried = op.fried ?? 0;
+                            np.restMode = op.restMode ?? false;
+                            np.violations = op.violations ?? 0;
+                        }
+                    });
+                } catch (e) {}
+            }
+            return fresh;
+        }
+
+        let appData = loadAppData();
+
+        function saveAppData() {
+            localStorage.setItem('couple_fitness_data_v7', JSON.stringify(appData));
+        }
+
+        // Compute accumulated weekly exercise counts strictly from dailyCheckins
+        function getWeeklyExerciseStats(profile) {
+            let cardio = 0;
+            let sculpt = 0;
+            const completedDays = [];
+
+            (profile.dailyCheckins || []).forEach((dayObj, idx) => {
+                const exType = dayObj.exercise ? dayObj.exercise.selectedType : null;
+                if (exType === 'cardio') {
+                    cardio += 1;
+                    completedDays.push({ day: days[idx].name, label: '🏃‍♀️ 有氧', type: 'cardio' });
+                } else if (exType === 'sculpt') {
+                    sculpt += 1;
+                    completedDays.push({ day: days[idx].name, label: '🧘‍♀️ 體態雕塑', type: 'sculpt' });
+                }
+            });
+
+            return {
+                cardio,
+                sculpt,
+                total: cardio + sculpt,
+                completedDays
+            };
+        }
+
+        // Coach quotes
+        const girlQuotes = [
+            "「Anna，昨天深夜 10 點才吃晚餐＋喝水暴增 1 公斤那是水腫！下禮拜一乖乖給我喝滿 1800cc，甜食最多 3 次、炸物最多 2 次，少給我偷吃！」",
+            "「國考跟期中考都過了，藉口用完了喔！43公斤只是暫時的水分障礙，給本教練把 1800cc 水喝好、有氧跟體態雕塑累積起來！」",
+            "「沒做到一項就是罰 $100！妳的錢包跟下巴痘痘都在盯著妳，時間一到乖乖關燈擦思利安藥膏！」",
+            "「每週有氧 2-3 次、體態雕塑 3-4 次，生理期前或通車回家才能按休息鍵，平時不准給我裝死偷懶！」"
+        ];
+
+        const boyfriendQuotes = [
+            "「Fergal 警告！說好要陪 Anna 一起減肥的，你要是敢偷吃炸物甜食或偷懶不運動，女朋友真的會很不喜歡、會生氣喔！」",
+            "「一項沒做到就是直接罰款 $100！不要以為沒關係，Anna 不喜歡男生說話不算話，快去把 1800cc 水喝完！」",
+            "「Fergal 你如果深夜還在旁邊滑手機害 Anna 跟著熬夜長痘痘，不但要罰錢，女朋友還會對你很失望！現在立刻準備去睡覺！」",
+            "「甜食一週只能 3 次、炸物只能 2 次！你要是敢買宵夜誘惑 Anna 破戒，罰款直接加倍，女朋友絕對不會原諒你！」"
+        ];
+
+        const annaEncouragements = [
+            "「太棒了 Anna！每一次體重與體脂的微幅下降，都是妳早睡、喝足 1800cc 水與克制甜食的最好證明，皮膚也會跟著越來越透亮喔！✨」",
+            "「自律的女生最美！妳已經成功跨出最難的第一步了，重回 41.7kg 輕盈狀態指日可待，繼續保持這個超棒的節奏！💖」",
+            "「看這漂亮的下降曲線！多喝水加上排便順暢，身體的負擔變輕了，下巴痘痘跟水腫都會乖乖退散的，Anna 加油！🌸」",
+            "「妳的努力身體都記住了！不用急著一天瘦很多，這樣穩穩地減脂、健康作息，瘦下來不但線條好看還不容易復胖喔！🏆」"
+        ];
+
+        const fergalEncouragements = [
+            "「Fergal 表現超讚！體重往下掉的同時，也給了 Anna 最強的陪伴動力，女朋友看到你這麼認真一定超級開心！💪」",
+            "「男人說到做到最帥氣！繼續保持喝水 1800cc 跟規律運動，不僅身材更精實，還能免繳罰款、讓 Anna 超滿意！🔥」",
+            "「太強了 Fergal！數據不會騙人，只要管住嘴、邁開腿，體脂跟體重就會乖乖聽話，繼續當 Anna 最神隊友吧！🚀」"
+        ];
+
+        function refreshEncouragementQuote(customMsg) {
+            const textEl = document.getElementById('encouragement-text');
+            if (customMsg) {
+                textEl.innerText = customMsg;
+                return;
+            }
+            const pool = currentUser === 'user' ? annaEncouragements : fergalEncouragements;
+            const idx = Math.floor(Math.random() * pool.length);
+            textEl.innerText = pool[idx];
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast-banner');
+            document.getElementById('toast-message').innerText = msg;
+            toast.classList.remove('opacity-0');
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+            }, 2800);
+        }
+
+        function changeQuote() {
+            const list = currentUser === 'user' ? girlQuotes : boyfriendQuotes;
+            const randomIndex = Math.floor(Math.random() * list.length);
+            document.getElementById('coach-quote').innerText = list[randomIndex];
+        }
+
+        function switchUser(user) {
+            currentUser = user;
+            const mainTitle = document.getElementById('main-room-title');
+            const userTab = document.getElementById('tab-user');
+            const bfTab = document.getElementById('tab-boyfriend');
+            const subtitle = document.getElementById('current-user-subtitle');
+            const coachBadge = document.getElementById('coach-badge');
+
+            if (user === 'user') {
+                mainTitle.innerHTML = `<i class="fa-solid fa-heart-pulse text-rosePrimary animate-pulse"></i> Anna的戰情室`;
+                userTab.className = "px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 shadow-sm flex items-center gap-2 bg-rosePrimary text-white shadow-rose-200";
+                bfTab.className = "px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 shadow-sm flex items-center gap-2 bg-white text-slate-600 hover:bg-slate-50 border border-slate-200";
+                subtitle.innerText = `目前檢視：Anna的戰情室專屬任務卡 (目標：發光美肌＋重回 41.7kg)`;
+                coachBadge.innerText = "魔鬼教練碎碎念 📢";
+            } else {
+                mainTitle.innerHTML = `<i class="fa-solid fa-shield-heart text-indigo-600 animate-pulse"></i> Fergal的戰情室`;
+                bfTab.className = "px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 shadow-sm flex items-center gap-2 bg-indigo-600 text-white shadow-indigo-200";
+                userTab.className = "px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 shadow-sm flex items-center gap-2 bg-white text-slate-600 hover:bg-slate-50 border border-slate-200";
+                subtitle.innerText = "目前檢視：Fergal的戰情室陪跑特訓卡 (偷懶罰錢＋Anna會生氣！)";
+                coachBadge.innerText = "⚠️ Fergal 專屬警告：女朋友在看！";
+            }
+            changeQuote();
+            refreshEncouragementQuote();
+            renderApp();
+        }
+
+        function selectDay(index) {
+            currentDayIndex = index;
+            renderApp();
+        }
+
+        // Toggle standard daily items (diet, water, sleep, skincare)
+        function toggleDailyField(field) {
+            const profile = appData.profiles[currentUser];
+            const dayData = profile.dailyCheckins[currentDayIndex];
+            if (!dayData || !dayData[field]) return;
+
+            dayData[field].checked = !dayData[field].checked;
+
+            // Sync water check-in with the 1800cc water tracker
+            if (field === 'water') {
+                if (dayData.water.checked && profile.water < 1800) {
+                    profile.water = 1800;
+                    showToast('💧 已同步完成今日 1800cc 飲水目標！');
+                } else if (!dayData.water.checked && profile.water >= 1800) {
+                    profile.water = 1500;
+                }
+            }
+
+            if (dayData[field].checked) {
+                triggerMiniConfetti();
+            }
+
+            saveAppData();
+            renderApp();
+        }
+
+        // Mutually exclusive daily exercise selection: 'cardio' vs 'sculpt'
+        function selectDailyExercise(type) {
+            const profile = appData.profiles[currentUser];
+            const dayData = profile.dailyCheckins[currentDayIndex];
+            if (!dayData || !dayData.exercise) return;
+
+            if (dayData.exercise.selectedType === type) {
+                // Clicking the already-selected option deselects it
+                dayData.exercise.selectedType = null;
+                showToast('已取消當日運動勾選');
+            } else {
+                // Switch to the chosen option (mutually exclusive)
+                dayData.exercise.selectedType = type;
+                triggerMiniConfetti();
+                const label = type === 'cardio' ? '🏃‍♀️ 有氧運動' : '🧘‍♀️ 體態雕塑';
+                showToast(`💪 已打卡「${label}」，已自動累積至本週運動次數！`);
+            }
+
+            saveAppData();
+            renderApp();
+        }
+
+        // Log actual bedtime and auto-check the sleep goal
+        function setDailyBedtime(timeStr) {
+            const profile = appData.profiles[currentUser];
+            const dayData = profile.dailyCheckins[currentDayIndex];
+            if (!dayData || !dayData.sleep) return;
+
+            dayData.sleep.bedtime = timeStr;
+            if (timeStr) {
+                dayData.sleep.checked = true;
+                triggerMiniConfetti();
+                showToast(`😴 已記錄 ${days[currentDayIndex].name} 入睡時間：${timeStr}`);
+            }
+
+            saveAppData();
+            renderApp();
+        }
+
+        // Bowel Movement Counter & Condition
+        function updateBowelCount(delta) {
+            const profile = appData.profiles[currentUser];
+            profile.bowelCount = Math.max(0, (profile.bowelCount || 0) + delta);
+            if (profile.bowelCount > 0 && profile.bowelCondition === '還沒上廁所') {
+                profile.bowelCondition = '順暢成形';
+            } else if (profile.bowelCount === 0) {
+                profile.bowelCondition = '還沒上廁所';
+            }
+            if (delta > 0) {
+                triggerMiniConfetti();
+                showToast(`💩 太好了！今日排便已達 ${profile.bowelCount} 次，腸道更順暢！`);
+            }
+            saveAppData();
+            renderApp();
+        }
+
+        function setBowelCondition(cond) {
+            const profile = appData.profiles[currentUser];
+            profile.bowelCondition = cond;
+            if (cond !== '還沒上廁所' && (!profile.bowelCount || profile.bowelCount === 0)) {
+                profile.bowelCount = 1;
+            }
+            saveAppData();
+            renderApp();
+        }
+
+        // Save Weight, Body Fat & Bowel Movement Log
+        function saveBodyMetrics() {
+            const profile = appData.profiles[currentUser];
+            const weightInput = document.getElementById('input-weight');
+            const bfInput = document.getElementById('input-bodyfat');
+
+            const wVal = parseFloat(weightInput.value);
+            const bfVal = parseFloat(bfInput.value);
+
+            if (isNaN(wVal) || wVal <= 0) {
+                showToast('⚠️ 請先輸入有效的體重數字 (kg) 喔！');
+                return;
+            }
+
+            const prevWeight = Number(profile.currentWeight || wVal);
+            const prevBodyFat = profile.currentBodyFat ? Number(profile.currentBodyFat) : null;
+
+            profile.currentWeight = wVal;
+            if (!isNaN(bfVal) && bfVal > 0) {
+                profile.currentBodyFat = bfVal;
+            }
+
+            const now = new Date();
+            const dateStr = `${now.getMonth() + 1}/${now.getDate()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+            if (!profile.bodyLogs) profile.bodyLogs = [];
+            profile.bodyLogs.unshift({
+                date: dateStr,
+                weight: wVal.toFixed(1),
+                bodyFat: (!isNaN(bfVal) && bfVal > 0) ? bfVal.toFixed(1) : (profile.currentBodyFat ? Number(profile.currentBodyFat).toFixed(1) : '--'),
+                bowelCount: profile.bowelCount || 0,
+                bowelCondition: profile.bowelCondition || '還沒上廁所'
+            });
+
+            weightInput.value = '';
+            bfInput.value = '';
+
+            const whoName = currentUser === 'user' ? 'Anna' : 'Fergal';
+            const weightDiff = prevWeight - wVal;
+            const bfDiff = (prevBodyFat !== null && !isNaN(bfVal) && bfVal > 0) ? (prevBodyFat - bfVal) : 0;
+
+            const targetW = Number(profile.targetWeight || (currentUser === 'user' ? 40.5 : 64.0));
+            const targetBF = Number(profile.targetBodyFat || (currentUser === 'user' ? 20.0 : 16.0));
+            const curBFNum = Number(profile.currentBodyFat || 99);
+            const reachedBoth = (wVal <= targetW) && (curBFNum <= targetBF);
+
+            if (reachedBoth && !appData.raceWinner) {
+                appData.raceWinner = currentUser;
+                appData.prizeClaimed = false;
+                triggerSuccessCelebration();
+                const winMsg = `🏆 奇蹟誕生！！${whoName} 率先同時達成目標體重 (${targetW}kg) 與目標體脂 (${targetBF}%)，成功抱走 NT$ 1,000 獎金！！🎉💰`;
+                refreshEncouragementQuote(winMsg);
+                showToast(`🏆 恭喜 ${whoName} 率先達標，贏得 NT$ 1,000 獎金！`);
+            } else if (weightDiff > 0 || bfDiff > 0) {
+                triggerSuccessCelebration();
+                const dropParts = [];
+                if (weightDiff > 0) dropParts.push(`體重下降了 ${weightDiff.toFixed(1)} kg`);
+                if (bfDiff > 0) dropParts.push(`體脂降低了 ${bfDiff.toFixed(1)}%`);
+                const customCongrats = `🎉 恭喜 ${whoName} 減重進展大突破！這次${dropParts.join('、')}！所有的早睡、喝水 1800cc 與運動堅持都化成了超棒的成果，離 NT$ 1,000 獎金越來越近囉！💖`;
+                refreshEncouragementQuote(customCongrats);
+                showToast(`🎊 太厲害了！${whoName} ${dropParts.join('、')}！`);
+            } else {
+                triggerMiniConfetti();
+                refreshEncouragementQuote();
+                showToast(`✅ 已更新 ${whoName} 體重 ${wVal.toFixed(1)} kg 與曲線圖！`);
+            }
+
+            saveAppData();
+            renderApp();
+        }
+
+        function triggerMiniConfetti() {
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 25,
+                    spread: 50,
+                    origin: { y: 0.7 }
+                });
+            }
+        }
+
+        // Target Weight & Body Fat Race Controls
+        function updateRaceTarget(role) {
+            const p = appData.profiles[role];
+            const wInput = document.getElementById(`target-weight-${role}`);
+            const bfInput = document.getElementById(`target-bf-${role}`);
+            const newW = parseFloat(wInput.value);
+            const newBF = parseFloat(bfInput.value);
+
+            if (!isNaN(newW) && newW > 0) p.targetWeight = newW;
+            if (!isNaN(newBF) && newBF > 0) p.targetBodyFat = newBF;
+
+            if (!appData.raceWinner) {
+                if (Number(p.currentWeight) <= Number(p.targetWeight) && Number(p.currentBodyFat) <= Number(p.targetBodyFat)) {
+                    appData.raceWinner = role;
+                    triggerSuccessCelebration();
+                }
+            }
+
+            saveAppData();
+            renderApp();
+            showToast(`🎯 已更新 ${role === 'user' ? 'Anna' : 'Fergal'} 的挑戰賽目標！`);
+        }
+
+        function claimRacePrize() {
+            if (!appData.raceWinner) return;
+            appData.prizeClaimed = true;
+            const winnerName = appData.raceWinner === 'user' ? '👧 Anna' : '👦 Fergal';
+            const payerName = appData.raceWinner === 'user' ? 'Fergal' : 'Anna';
+            const now = new Date();
+            const timeStr = `${now.getMonth() + 1}/${now.getDate()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            appData.logs.unshift({
+                who: winnerName,
+                reason: `🏆 率先達成目標體重與體脂，獲得 ${payerName} 支付獎金 NT$ 1,000！`,
+                time: timeStr
+            });
+            triggerSuccessCelebration();
+            saveAppData();
+            renderApp();
+            showToast(`💰 已登記 ${winnerName} 領取 NT$ 1,000 獎金，週日結算自動計入！`);
+        }
+
+        function resetRaceWinner() {
+            appData.raceWinner = null;
+            appData.prizeClaimed = false;
+            saveAppData();
+            renderApp();
+            showToast('🔄 已重置挑戰賽冠軍狀態，繼續衝刺下一階段目標！');
+        }
+
+        // Water Intake (1800cc goal) - syncs with current day's water check-in
+        function addWater(amount) {
+            const profile = appData.profiles[currentUser];
+            profile.water = Math.max(0, profile.water + amount);
+            const dayData = profile.dailyCheckins[currentDayIndex];
+
+            if (profile.water >= 1800) {
+                if (dayData && dayData.water && !dayData.water.checked) {
+                    dayData.water.checked = true;
+                }
+                if (amount > 0) {
+                    triggerMiniConfetti();
+                    showToast('🎉 太棒了！今日 1800cc 飲水目標達成並自動打卡！');
+                }
+            } else {
+                if (dayData && dayData.water && dayData.water.checked) {
+                    dayData.water.checked = false;
+                }
+            }
+
+            saveAppData();
+            renderApp();
+        }
+
+        // Weekly Treats: Max 3 Sweets OR Max 2 Fried Food
+        function logTreat(type) {
+            const profile = appData.profiles[currentUser];
+            if (type === 'sweets') {
+                profile.sweets += 1;
+                if (profile.sweets > 3) {
+                    addViolation(1, '甜食超過本週 3 次上限');
+                    showToast('🚨 甜食超標啦！自動罰款 +$100！');
+                } else {
+                    showToast(`🍰 已記錄甜食 (${profile.sweets}/3 次)，請克制！`);
+                }
+            } else if (type === 'fried') {
+                profile.fried += 1;
+                if (profile.fried > 2) {
+                    addViolation(1, '炸物超過本週 2 次上限');
+                    showToast('🚨 炸物超標啦！自動罰款 +$100！');
+                } else {
+                    showToast(`🍗 已記錄炸物 (${profile.fried}/2 次)，小心長痘痘！`);
+                }
+            }
+            saveAppData();
+            renderApp();
+        }
+
+        // Rest Exception Toggle
+        function toggleRestMode() {
+            const profile = appData.profiles[currentUser];
+            profile.restMode = !profile.restMode;
+            if (profile.restMode) {
+                showToast('🛌 已開啟「生理期前/通車回家休息」免罰模式');
+            } else {
+                showToast('🔥 已切回正常特訓模式！');
+            }
+            saveAppData();
+            renderApp();
+        }
+
+        // Cycle Sleep Week Target
+        function cycleSleepWeek() {
+            appData.sleepStageIndex = (appData.sleepStageIndex + 1) % sleepStages.length;
+            saveAppData();
+            renderApp();
+        }
+
+        // Fine & Violation Functions (NT$100 per missed item)
+        function addViolation(delta, reason) {
+            adjustUserFine(currentUser, delta, reason);
+        }
+
+        function adjustUserFine(targetUser, delta, reason) {
+            const profile = appData.profiles[targetUser];
+            profile.violations = Math.max(0, profile.violations + delta);
+            if (delta > 0) {
+                const whoName = targetUser === 'user' ? '👧 Anna' : '👦 Fergal';
+                const now = new Date();
+                const timeStr = `${now.getMonth() + 1}/${now.getDate()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+                appData.logs.unshift({ who: whoName, reason: reason, time: timeStr });
+                showToast(`💸 ${whoName} 記上一筆罰款 $100（${reason}）`);
+            }
+            saveAppData();
+            renderApp();
+        }
+
+        function triggerSuccessCelebration() {
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 65,
+                    spread: 80,
+                    origin: { y: 0.65 },
+                    colors: ['#fb7185', '#f43f5e', '#fbbf24', '#34d399', '#a855f7']
+                });
+            }
+        }
+
+        // Weekly Settlement Modal (Uses auto-accumulated exercise counts)
+        function openSettlementModal() {
+            const u = appData.profiles.user;
+            const bf = appData.profiles.boyfriend;
+            const uEx = getWeeklyExerciseStats(u);
+            const bfEx = getWeeklyExerciseStats(bf);
+
+            let uExMissing = 0;
+            if (!u.restMode) {
+                if (uEx.cardio < 2) uExMissing += (2 - uEx.cardio);
+                if (uEx.sculpt < 3) uExMissing += (3 - uEx.sculpt);
+            }
+            let bfExMissing = 0;
+            if (!bf.restMode) {
+                if (bfEx.cardio < 2) bfExMissing += (2 - bfEx.cardio);
+                if (bfEx.sculpt < 3) bfExMissing += (3 - bfEx.sculpt);
+            }
+
+            const uTotalItems = u.violations + uExMissing;
+            const bfTotalItems = bf.violations + bfExMissing;
+            const uTotalMoney = uTotalItems * 100;
+            const bfTotalMoney = bfTotalItems * 100;
+
+            let prizeSummaryHtml = '';
+            let uNetPay = uTotalMoney;
+            let bfNetPay = bfTotalMoney;
+
+            if (appData.raceWinner) {
+                const winnerLabel = appData.raceWinner === 'user' ? '👧 Anna' : '👦 Fergal';
+                const loserLabel = appData.raceWinner === 'user' ? 'Fergal' : 'Anna';
+                if (appData.raceWinner === 'user') {
+                    bfNetPay += 1000;
+                } else {
+                    uNetPay += 1000;
+                }
+                prizeSummaryHtml = `
+                    <div class="bg-amber-50 p-3.5 rounded-2xl border border-amber-200 space-y-1">
+                        <div class="font-extrabold text-amber-800 flex justify-between text-xs sm:text-sm">
+                            <span>🏆 目標體重＆體脂挑戰賽獎金：</span>
+                            <span>NT$ 1,000</span>
+                        </div>
+                        <p class="text-xs text-amber-700">恭喜 <strong>${winnerLabel}</strong> 率先雙達標！由 ${loserLabel} 支付 <strong>NT$ 1,000</strong> 獎金${appData.prizeClaimed ? '（已登記領獎 ✅）' : ''}。</p>
+                    </div>
+                `;
+            }
+
+            const content = document.getElementById('settlement-content');
+            content.innerHTML = `
+                ${prizeSummaryHtml}
+                <div class="bg-rose-50 p-3.5 rounded-2xl space-y-1 border border-rose-100">
+                    <div class="font-bold text-slate-800 flex justify-between">
+                        <span>👧 Anna 本週應付金額：</span>
+                        <span class="text-roseDark font-extrabold">NT$ ${uNetPay}</span>
+                    </div>
+                    <p class="text-xs text-slate-500">違規罰款 NT$ ${uTotalMoney}（已登記 ${u.violations} 項＋運動差額 ${uExMissing} 項；累積有氧 ${uEx.cardio} 次、體態雕塑 ${uEx.sculpt} 次）${appData.raceWinner === 'boyfriend' ? ' ＋ 挑戰賽獎金 NT$ 1,000' : ''}</p>
+                </div>
+
+                <div class="bg-indigo-50 p-3.5 rounded-2xl space-y-1 border border-indigo-100">
+                    <div class="font-bold text-slate-800 flex justify-between">
+                        <span>👦 Fergal 本週應付金額：</span>
+                        <span class="text-indigo-600 font-extrabold">NT$ ${bfNetPay}</span>
+                    </div>
+                    <p class="text-xs text-slate-500">違規罰款 NT$ ${bfTotalMoney}（已登記 ${bf.violations} 項＋運動差額 ${bfExMissing} 項；累積有氧 ${bfEx.cardio} 次、體態雕塑 ${bfEx.sculpt} 次）${appData.raceWinner === 'user' ? ' ＋ 挑戰賽獎金 NT$ 1,000' : ''}</p>
+                </div>
+
+                <div class="text-center pt-2 font-bold text-slate-700">
+                    ${uNetPay === bfNetPay 
+                        ? '🤝 兩人本週金額抵銷平手！' 
+                        : (uNetPay > bfNetPay 
+                            ? `💸 Anna 淨應支付 NT$ ${uNetPay - bfNetPay} 給 Fergal！` 
+                            : `🎉 Fergal 淨應支付 NT$ ${bfNetPay - uNetPay} 給 Anna！`)}
+                </div>
+            `;
+
+            const modal = document.getElementById('settlement-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeSettlementModal() {
+            const modal = document.getElementById('settlement-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function resetWeeklyStats() {
+            ['user', 'boyfriend'].forEach(role => {
+                const p = appData.profiles[role];
+                p.water = 0;
+                p.sweets = 0;
+                p.fried = 0;
+                p.restMode = false;
+                p.violations = 0;
+                p.dailyCheckins = createDefaultTasks(role);
+            });
+            appData.logs = [];
+            saveAppData();
+            closeSettlementModal();
+            renderApp();
+            showToast('✨ 已完成結算並重置，新的一週加油！');
+        }
+
+        function renderApp() {
+            const profile = appData.profiles[currentUser];
+            const uProfile = appData.profiles.user;
+            const bfProfile = appData.profiles.boyfriend;
+
+            // Update Header Weights
+            const uWeightStr = `${Number(uProfile.currentWeight || 43.0).toFixed(1)} kg`;
+            const bfWeightStr = `${Number(bfProfile.currentWeight || 68.0).toFixed(1)} kg`;
+            document.getElementById('header-user-weight').innerText = uWeightStr;
+            document.getElementById('header-bf-weight').innerText = bfWeightStr;
+            document.getElementById('tab-user-weight').innerText = `${Number(uProfile.currentWeight || 43.0).toFixed(1)}kg`;
+            document.getElementById('tab-bf-weight').innerText = `${Number(bfProfile.currentWeight || 68.0).toFixed(1)}kg`;
+
+            // Update Target Weight & Body Fat Race UI
+            renderRaceSection();
+
+            // Update Bowel Movement Tracker UI
+            const bCount = profile.bowelCount || 0;
+            const bCond = profile.bowelCondition || '還沒上廁所';
+            document.getElementById('bowel-count-display').innerText = `${bCount} 次`;
+
+            const bowelBadge = document.getElementById('bowel-status-badge');
+            if (bCount === 0) {
+                bowelBadge.className = "self-start sm:self-auto px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-roseDark";
+                bowelBadge.innerText = "0次：便秘警報🚨 快喝水吃菜！";
+            } else if (bCount === 1) {
+                bowelBadge.className = "self-start sm:self-auto px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700";
+                bowelBadge.innerText = "1次：順暢達標✨ 繼續保持！";
+            } else {
+                bowelBadge.className = "self-start sm:self-auto px-3 py-1 rounded-full text-xs font-bold bg-sky-100 text-sky-700";
+                bowelBadge.innerText = `${bCount}次：腸道超健康🎉 代謝滿分！`;
+            }
+
+            const condMap = {
+                '還沒上廁所': 'cond-none',
+                '偏硬/卡卡': 'cond-hard',
+                '順暢成形': 'cond-smooth'
+            };
+            Object.entries(condMap).forEach(([label, btnId]) => {
+                const btn = document.getElementById(btnId);
+                if (btn) {
+                    btn.className = label === bCond
+                        ? "px-2.5 py-1 rounded-lg text-[11px] font-bold border transition bg-amber-500 text-white border-amber-500 shadow-sm"
+                        : "px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition bg-white text-slate-600 border-slate-200 hover:bg-amber-50";
+                }
+            });
+
+            // Update Weight & Body Fat Summary & Logs
+            const curW = Number(profile.currentWeight || (currentUser === 'user' ? 43.0 : 68.0));
+            const startW = Number(profile.startWeight || (currentUser === 'user' ? 43.0 : 68.0));
+            const diffW = (curW - startW).toFixed(1);
+            document.getElementById('summary-weight').innerText = `${curW.toFixed(1)} kg`;
+            const deltaEl = document.getElementById('summary-weight-delta');
+            if (Number(diffW) < 0) {
+                deltaEl.className = "text-emerald-600 font-bold";
+                deltaEl.innerText = `較初始 ${diffW} kg 🎉`;
+            } else if (Number(diffW) > 0) {
+                deltaEl.className = "text-roseDark font-bold";
+                deltaEl.innerText = `較初始 +${diffW} kg`;
+            } else {
+                deltaEl.className = "text-slate-500";
+                deltaEl.innerText = `較初始 0.0 kg`;
+            }
+
+            document.getElementById('summary-bodyfat').innerText = profile.currentBodyFat ? `${Number(profile.currentBodyFat).toFixed(1)} %` : '-- %';
+
+            const bodyHistoryEl = document.getElementById('body-history-list');
+            if (!profile.bodyLogs || profile.bodyLogs.length === 0) {
+                bodyHistoryEl.innerHTML = `<p class="text-[11px] text-slate-400 text-center">尚未新增體重／體脂歷史紀錄，快輸入今日數據吧！</p>`;
+            } else {
+                bodyHistoryEl.innerHTML = profile.bodyLogs.map(item => `
+                    <div class="flex items-center justify-between text-[11px] border-b border-slate-100 pb-1 last:border-0">
+                        <span>
+                            <strong class="text-roseDark">${item.weight} kg</strong>
+                            <span class="text-slate-500 ml-1.5">體脂 ${item.bodyFat}%</span>
+                            <span class="ml-1.5 px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 font-medium">💩 ${item.bowelCount}次 (${item.bowelCondition})</span>
+                        </span>
+                        <span class="text-slate-400 text-[10px]">${item.date}</span>
+                    </div>
+                `).join('');
+            }
+
+            renderBodyMetricsChart(profile);
+
+            // Update Top Stats
+            document.getElementById('stat-sweets').innerText = profile.sweets;
+            document.getElementById('stat-fried').innerText = profile.fried;
+
+            const sleepObj = sleepStages[appData.sleepStageIndex];
+            document.getElementById('stat-sleep').innerText = sleepObj.time;
+            document.getElementById('stat-sleep-week').innerText = sleepObj.week;
+
+            document.getElementById('stat-fine').innerText = `NT$ ${profile.violations * 100}`;
+
+            // Update Water Bar (1800cc)
+            document.getElementById('water-text').innerText = `${profile.water} / 1800 cc`;
+            const waterPct = Math.min(100, Math.round((profile.water / 1800) * 100));
+            document.getElementById('water-bar').style.width = `${waterPct}%`;
+
+            // Update Auto-Accumulated Weekly Exercise Tracker
+            const exStats = getWeeklyExerciseStats(profile);
+            document.getElementById('ex-total-count').innerText = `${exStats.total} / 5 次`;
+            const exTotalPct = Math.min(100, Math.round((exStats.total / 5) * 100));
+            document.getElementById('ex-total-bar').style.width = `${exTotalPct}%`;
+
+            document.getElementById('ex-cardio-count').innerText = `${exStats.cardio} 次`;
+            const cardioStatusEl = document.getElementById('ex-cardio-status');
+            if (exStats.cardio >= 2) {
+                cardioStatusEl.className = "text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-bold";
+                cardioStatusEl.innerText = "已達標 ✅";
+            } else {
+                cardioStatusEl.className = "text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 font-semibold";
+                cardioStatusEl.innerText = `差 ${2 - exStats.cardio} 次`;
+            }
+
+            document.getElementById('ex-sculpt-count').innerText = `${exStats.sculpt} 次`;
+            const sculptStatusEl = document.getElementById('ex-sculpt-status');
+            if (exStats.sculpt >= 3) {
+                sculptStatusEl.className = "text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-bold";
+                sculptStatusEl.innerText = "已達標 ✅";
+            } else {
+                sculptStatusEl.className = "text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 font-semibold";
+                sculptStatusEl.innerText = `差 ${3 - exStats.sculpt} 次`;
+            }
+
+            const exDaysSummaryEl = document.getElementById('ex-days-summary');
+            if (exStats.completedDays.length === 0) {
+                exDaysSummaryEl.innerHTML = `<span class="text-[10px] text-slate-400">尚未在下方每日面板勾選運動</span>`;
+            } else {
+                exDaysSummaryEl.innerHTML = exStats.completedDays.map(d => {
+                    const pillClass = d.type === 'cardio'
+                        ? 'bg-rose-100 text-roseDark border-rose-200'
+                        : 'bg-purple-100 text-purple-700 border-purple-200';
+                    return `<span class="px-2 py-0.5 rounded-full border font-semibold ${pillClass}">${d.day} ${d.label}</span>`;
+                }).join('');
+            }
+
+            const restBtn = document.getElementById('btn-rest-mode');
+            const restNotice = document.getElementById('rest-mode-notice');
+            if (profile.restMode) {
+                restBtn.className = "px-2.5 py-1 rounded-full text-[10px] font-bold transition flex items-center gap-1 bg-amber-500 text-white shadow-sm shrink-0";
+                restNotice.classList.remove('hidden');
+            } else {
+                restBtn.className = "px-2.5 py-1 rounded-full text-[10px] font-bold transition flex items-center gap-1 bg-slate-100 text-slate-500 border border-slate-200 shrink-0";
+                restNotice.classList.add('hidden');
+            }
+
+            // Update Dual Fine Comparison Panel
+            document.getElementById('user-violation-count').innerText = `${uProfile.violations} 項`;
+            document.getElementById('user-fine-total').innerText = `NT$ ${uProfile.violations * 100}`;
+            document.getElementById('bf-violation-count').innerText = `${bfProfile.violations} 項`;
+            document.getElementById('bf-fine-total').innerText = `NT$ ${bfProfile.violations * 100}`;
+
+            // Render Violation Logs
+            const logContainer = document.getElementById('violation-log-list');
+            if (appData.logs.length === 0) {
+                logContainer.innerHTML = `<p class="text-[11px] text-slate-400 text-center">目前本週尚無違規紀錄，繼續保持！✨</p>`;
+            } else {
+                logContainer.innerHTML = appData.logs.map(log => `
+                    <div class="flex items-center justify-between text-[11px] border-b border-slate-100 pb-1 last:border-0">
+                        <span><strong>${log.who}</strong>：${log.reason} <span class="text-roseDark font-bold">(+$100)</span></span>
+                        <span class="text-slate-400 text-[10px]">${log.time}</span>
+                    </div>
+                `).join('');
+            }
+
+            // Render Day Tabs with small completion indicator dot
+            const dayTabsContainer = document.getElementById('day-tabs');
+            dayTabsContainer.innerHTML = days.map((day, idx) => {
+                const isActive = idx === currentDayIndex;
+                const dObj = profile.dailyCheckins[idx];
+                const dDoneCount = [
+                    dObj.diet.checked,
+                    dObj.water.checked,
+                    Boolean(dObj.exercise.selectedType),
+                    dObj.sleep.checked,
+                    dObj.skincare.checked
+                ].filter(Boolean).length;
+
+                const activeClass = isActive 
+                    ? (currentUser === 'user' ? 'bg-rosePrimary text-white shadow-md' : 'bg-indigo-600 text-white shadow-md')
+                    : 'bg-white/80 text-slate-600 hover:bg-rose-50 border border-slate-200';
+                const badgeText = dDoneCount === 5 ? '✨' : (dDoneCount > 0 ? `${dDoneCount}/5` : '');
+                return `
+                    <button onclick="selectDay(${idx})" class="px-3 py-1.5 rounded-xl text-xs font-medium transition-all shrink-0 flex items-center gap-1 ${activeClass}">
+                        <span>${day.name}</span>
+                        ${badgeText ? `<span class="text-[10px] opacity-90">${badgeText}</span>` : ''}
+                    </button>
+                `;
+            }).join('');
+
+            // Render Daily Check-in Items for current day
+            const dayData = profile.dailyCheckins[currentDayIndex];
+            const container = document.getElementById('checkin-items-container');
+
+            const isDietDone = dayData.diet.checked;
+            const isWaterDone = dayData.water.checked;
+            const exSelected = dayData.exercise.selectedType; // null | 'cardio' | 'sculpt'
+            const isExDone = Boolean(exSelected);
+            const isSleepDone = dayData.sleep.checked;
+            const isSkincareDone = dayData.skincare.checked;
+
+            const completedCount = [isDietDone, isWaterDone, isExDone, isSleepDone, isSkincareDone].filter(Boolean).length;
+            const totalCount = 5;
+            const percent = Math.round((completedCount / totalCount) * 100);
+
+            const renderStandardCard = (fieldKey, itemObj) => {
+                const checkedClass = itemObj.checked
+                    ? 'bg-rose-50/90 border-rose-300 opacity-85'
+                    : 'bg-white/95 border-slate-200 hover:border-rose-200';
+                const textStyle = itemObj.checked ? 'line-through text-slate-400' : 'text-slate-800';
+                const iconStyle = itemObj.checked ? 'bg-rosePrimary text-white' : 'bg-slate-100 text-slate-300';
+                return `
+                    <div onclick="toggleDailyField('${fieldKey}')" class="glass-card rounded-2xl p-4 border transition-all duration-300 cursor-pointer flex items-start gap-3.5 ${checkedClass}">
+                        <div class="w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5 transition-colors ${iconStyle}">
+                            <i class="fa-solid fa-check text-xs"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-sm font-bold ${textStyle}">${itemObj.title}</h3>
+                            <p class="text-xs text-slate-500 mt-0.5">${itemObj.desc}</p>
+                        </div>
+                    </div>
+                `;
+            };
+
+            // Exercise Card with Mutually Exclusive Choice: 有氧運動 vs 體態雕塑
+            const exCardClass = isExDone
+                ? 'bg-rose-50/90 border-rose-300'
+                : 'bg-white/95 border-slate-200';
+            const exIconStyle = isExDone ? 'bg-rosePrimary text-white' : 'bg-slate-100 text-slate-300';
+            const cardioBtnClass = exSelected === 'cardio'
+                ? 'bg-rosePrimary text-white border-rosePrimary shadow-sm ring-2 ring-rose-200'
+                : 'bg-white hover:bg-rose-50 text-slate-600 border-slate-200';
+            const sculptBtnClass = exSelected === 'sculpt'
+                ? 'bg-purple-600 text-white border-purple-600 shadow-sm ring-2 ring-purple-200'
+                : 'bg-white hover:bg-purple-50 text-slate-600 border-slate-200';
+
+            const exerciseCardHtml = `
+                <div class="glass-card rounded-2xl p-4 border transition-all duration-300 flex items-start gap-3.5 ${exCardClass}">
+                    <div class="w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5 transition-colors ${exIconStyle}">
+                        <i class="fa-solid fa-check text-xs"></i>
+                    </div>
+                    <div class="flex-1 space-y-2.5">
+                        <div>
+                            <div class="flex flex-wrap items-center justify-between gap-1">
+                                <h3 class="text-sm font-bold text-slate-800">${dayData.exercise.title}</h3>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${isExDone ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}">
+                                    ${exSelected === 'cardio' ? '已選：有氧運動 (+1累積)' : (exSelected === 'sculpt' ? '已選：體態雕塑 (+1累積)' : '尚未選擇')}
+                                </span>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-0.5">${dayData.exercise.desc}</p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2.5">
+                            <button type="button" onclick="selectDailyExercise('cardio')" class="py-2 px-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${cardioBtnClass}">
+                                <i class="fa-solid ${exSelected === 'cardio' ? 'fa-circle-check' : 'fa-circle'}"></i>
+                                <span>🏃‍♀️ 有氧運動</span>
+                            </button>
+                            <button type="button" onclick="selectDailyExercise('sculpt')" class="py-2 px-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${sculptBtnClass}">
+                                <i class="fa-solid ${exSelected === 'sculpt' ? 'fa-circle-check' : 'fa-circle'}"></i>
+                                <span>🧘‍♀️ 體態雕塑</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Sleep Card with Check-in + Bedtime Time Picker
+            const sleepCardClass = isSleepDone
+                ? 'bg-rose-50/90 border-rose-300'
+                : 'bg-white/95 border-slate-200 hover:border-rose-200';
+            const sleepTextStyle = isSleepDone ? 'line-through text-slate-400' : 'text-slate-800';
+            const sleepIconStyle = isSleepDone ? 'bg-rosePrimary text-white' : 'bg-slate-100 text-slate-300';
+
+            const sleepCardHtml = `
+                <div onclick="toggleDailyField('sleep')" class="glass-card rounded-2xl p-4 border transition-all duration-300 cursor-pointer flex items-start gap-3.5 ${sleepCardClass}">
+                    <div class="w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5 transition-colors ${sleepIconStyle}">
+                        <i class="fa-solid fa-check text-xs"></i>
+                    </div>
+                    <div class="flex-1 space-y-2">
+                        <div>
+                            <div class="flex flex-wrap items-center justify-between gap-1">
+                                <h3 class="text-sm font-bold ${sleepTextStyle}">${dayData.sleep.title}</h3>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-100">
+                                    目標：${sleepObj.time} 前
+                                </span>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-0.5">${dayData.sleep.desc}</p>
+                        </div>
+                        <div onclick="event.stopPropagation()" class="flex flex-wrap items-center gap-2 pt-0.5">
+                            <label class="text-[11px] font-semibold text-slate-500 flex items-center gap-1">
+                                <i class="fa-regular fa-clock text-rosePrimary"></i> 實際入睡時間：
+                            </label>
+                            <input type="time" value="${dayData.sleep.bedtime || ''}" onchange="setDailyBedtime(this.value)" class="px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-xs font-bold text-slate-700 focus:outline-none focus:border-rosePrimary">
+                            ${dayData.sleep.bedtime ? `<span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">已記錄 ${dayData.sleep.bedtime} ✨</span>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = `
+                ${renderStandardCard('diet', dayData.diet)}
+                ${renderStandardCard('water', dayData.water)}
+                ${exerciseCardHtml}
+                ${sleepCardHtml}
+                ${renderStandardCard('skincare', dayData.skincare)}
+            `;
+
+            // Update Progress Bar
+            document.getElementById('progress-day-label').innerText = `${days[currentDayIndex].name}打卡進度`;
+            document.getElementById('progress-text').innerText = `${completedCount} / ${totalCount} 項 (${percent}%)`;
+            document.getElementById('progress-bar').style.width = `${percent}%`;
+        }
+
+        function calcProgressPercent(startVal, currentVal, targetVal) {
+            if (currentVal <= targetVal) return 100;
+            if (startVal <= targetVal) return 0;
+            const totalNeeded = startVal - targetVal;
+            const achieved = startVal - currentVal;
+            return Math.max(0, Math.min(100, Math.round((achieved / totalNeeded) * 100)));
+        }
+
+        function renderRaceSection() {
+            const u = appData.profiles.user;
+            const bf = appData.profiles.boyfriend;
+
+            const uWInput = document.getElementById('target-weight-user');
+            const uBfInput = document.getElementById('target-bf-user');
+            const bfWInput = document.getElementById('target-weight-boyfriend');
+            const bfBfInput = document.getElementById('target-bf-boyfriend');
+
+            if (document.activeElement !== uWInput) uWInput.value = Number(u.targetWeight || 40.5).toFixed(1);
+            if (document.activeElement !== uBfInput) uBfInput.value = Number(u.targetBodyFat || 20.0).toFixed(1);
+            if (document.activeElement !== bfWInput) bfWInput.value = Number(bf.targetWeight || 64.0).toFixed(1);
+            if (document.activeElement !== bfBfInput) bfBfInput.value = Number(bf.targetBodyFat || 16.0).toFixed(1);
+
+            const uCurW = Number(u.currentWeight || 43.0);
+            const uTarW = Number(u.targetWeight || 40.5);
+            const uStartW = Number(u.startWeight || 43.0);
+            const uWPct = calcProgressPercent(uStartW, uCurW, uTarW);
+
+            const uCurBF = Number(u.currentBodyFat || 22.8);
+            const uTarBF = Number(u.targetBodyFat || 20.0);
+            const uStartBF = Number(u.startBodyFat || 22.8);
+            const uBFPct = calcProgressPercent(uStartBF, uCurBF, uTarBF);
+
+            document.getElementById('race-cur-w-user').innerText = uCurW.toFixed(1);
+            document.getElementById('race-tar-w-user').innerText = uTarW.toFixed(1);
+            document.getElementById('race-pct-w-user').innerText = `${uWPct}%`;
+            document.getElementById('race-bar-w-user').style.width = `${uWPct}%`;
+
+            document.getElementById('race-cur-bf-user').innerText = uCurBF.toFixed(1);
+            document.getElementById('race-tar-bf-user').innerText = uTarBF.toFixed(1);
+            document.getElementById('race-pct-bf-user').innerText = `${uBFPct}%`;
+            document.getElementById('race-bar-bf-user').style.width = `${uBFPct}%`;
+
+            const annaStatus = document.getElementById('anna-race-status');
+            if (uWPct === 100 && uBFPct === 100) {
+                annaStatus.innerText = '🏆 雙達標！';
+                annaStatus.className = 'text-[11px] font-extrabold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800';
+            } else {
+                annaStatus.innerText = `綜合 ${Math.round((uWPct + uBFPct) / 2)}%`;
+                annaStatus.className = 'text-[11px] font-bold px-2 py-0.5 rounded-full bg-rose-50 text-roseDark';
+            }
+
+            const bfCurW = Number(bf.currentWeight || 68.0);
+            const bfTarW = Number(bf.targetWeight || 64.0);
+            const bfStartW = Number(bf.startWeight || 68.0);
+            const bfWPct = calcProgressPercent(bfStartW, bfCurW, bfTarW);
+
+            const bfCurBF = Number(bf.currentBodyFat || 21.5);
+            const bfTarBF = Number(bf.targetBodyFat || 16.0);
+            const bfStartBF = Number(bf.startBodyFat || 21.5);
+            const bfBFPct = calcProgressPercent(bfStartBF, bfCurBF, bfTarBF);
+
+            document.getElementById('race-cur-w-bf').innerText = bfCurW.toFixed(1);
+            document.getElementById('race-tar-w-bf').innerText = bfTarW.toFixed(1);
+            document.getElementById('race-pct-w-bf').innerText = `${bfWPct}%`;
+            document.getElementById('race-bar-w-bf').style.width = `${bfWPct}%`;
+
+            document.getElementById('race-cur-bf-bf').innerText = bfCurBF.toFixed(1);
+            document.getElementById('race-tar-bf-bf').innerText = bfTarBF.toFixed(1);
+            document.getElementById('race-pct-bf-bf').innerText = `${bfBFPct}%`;
+            document.getElementById('race-bar-bf-bf').style.width = `${bfBFPct}%`;
+
+            const fergalStatus = document.getElementById('fergal-race-status');
+            if (bfWPct === 100 && bfBFPct === 100) {
+                fergalStatus.innerText = '🏆 雙達標！';
+                fergalStatus.className = 'text-[11px] font-extrabold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800';
+            } else {
+                fergalStatus.innerText = `綜合 ${Math.round((bfWPct + bfBFPct) / 2)}%`;
+                fergalStatus.className = 'text-[11px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600';
+            }
+
+            const winnerBanner = document.getElementById('race-winner-banner');
+            const winnerBadge = document.getElementById('race-winner-badge');
+            const claimBtn = document.getElementById('btn-claim-prize');
+
+            if (appData.raceWinner) {
+                const isAnna = appData.raceWinner === 'user';
+                const winnerName = isAnna ? '👧 Anna' : '👦 Fergal';
+                const payerName = isAnna ? 'Fergal' : 'Anna';
+                winnerBanner.classList.remove('hidden');
+                winnerBadge.innerText = `🏆 ${winnerName} 贏得 NT$ 1,000！`;
+                document.getElementById('race-winner-title').innerText = `🏆 恭喜 ${winnerName} 率先同時達成目標體重與體脂！`;
+                document.getElementById('race-winner-desc').innerText = appData.prizeClaimed
+                    ? `已登記獲得 ${payerName} 支付的 NT$ 1,000 獎金（已自動納入週日結算單）！`
+                    : `按照約定，由 ${payerName} 支付 NT$ 1,000 現金獎勵！點擊下方按鈕立即登記入帳！`;
+
+                if (appData.prizeClaimed) {
+                    claimBtn.innerText = '✅ 已登記領取 NT$ 1,000';
+                    claimBtn.disabled = true;
+                    claimBtn.className = 'px-4 py-1.5 bg-emerald-600 text-white rounded-xl text-xs font-bold opacity-90 cursor-default';
+                } else {
+                    claimBtn.innerHTML = '<i class="fa-solid fa-hand-holding-dollar mr-1"></i> 登記領取 NT$ 1,000 獎金';
+                    claimBtn.disabled = false;
+                    claimBtn.className = 'px-4 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold shadow transition';
+                }
+            } else {
+                winnerBanner.classList.add('hidden');
+                winnerBadge.innerText = '🔥 NT$ 1,000 獎金爭奪中！';
+            }
+        }
+
+        function renderBodyMetricsChart(profile) {
+            const canvas = document.getElementById('bodyMetricsChart');
+            if (!canvas || typeof Chart === 'undefined') return;
+
+            const logs = [...(profile.bodyLogs || [])].reverse();
+            const labels = logs.map(l => l.date);
+            const weightData = logs.map(l => parseFloat(l.weight));
+            const bodyFatData = logs.map(l => l.bodyFat && l.bodyFat !== '--' ? parseFloat(l.bodyFat) : null);
+
+            const primaryColor = currentUser === 'user' ? '#e11d48' : '#4f46e5';
+            const primaryFill = currentUser === 'user' ? 'rgba(251, 113, 133, 0.16)' : 'rgba(99, 102, 241, 0.16)';
+
+            if (metricsChartInstance) {
+                metricsChartInstance.destroy();
+            }
+
+            metricsChartInstance = new Chart(canvas.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: '體重 (kg)',
+                            data: weightData,
+                            borderColor: primaryColor,
+                            backgroundColor: primaryFill,
+                            borderWidth: 2.5,
+                            pointBackgroundColor: primaryColor,
+                            pointRadius: 4,
+                            tension: 0.35,
+                            fill: true,
+                            yAxisID: 'yWeight'
+                        },
+                        {
+                            label: '體脂率 (%)',
+                            data: bodyFatData,
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            pointBackgroundColor: '#f59e0b',
+                            pointRadius: 4,
+                            tension: 0.35,
+                            spanGaps: true,
+                            yAxisID: 'yBodyFat'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                font: { size: 11, family: "'Inter', 'Noto Sans TC', sans-serif" },
+                                usePointStyle: true
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { font: { size: 10 } },
+                            grid: { display: false }
+                        },
+                        yWeight: {
+                            type: 'linear',
+                            position: 'left',
+                            title: { display: true, text: '體重 (kg)', font: { size: 10 }, color: primaryColor },
+                            ticks: { font: { size: 10 }, color: primaryColor }
+                        },
+                        yBodyFat: {
+                            type: 'linear',
+                            position: 'right',
+                            title: { display: true, text: '體脂 (%)', font: { size: 10 }, color: '#d97706' },
+                            ticks: { font: { size: 10 }, color: '#d97706' },
+                            grid: { drawOnChartArea: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        window.onload = function() {
+            renderApp();
+        };
+    </script>
+</body>
+</html>
